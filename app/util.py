@@ -1,11 +1,15 @@
 from pymongo import MongoClient, errors
 
 
-def connect_db(db_name: str = 'elearning'):
+def connect_db(mode=None):
     connection_str = "mongodb://localhost:27017/"
+    if mode is None:
+        db_name = 'elearning'
+    else:
+        db_name = 'test_elearning_db'
     try:
         client = MongoClient(connection_str)
-        print("Connection has established succesfully!")
+        print(f"Connection {db_name} has established succesfully!")
         db = client[db_name]
         return db
     except errors.ConnectionFailure:
@@ -30,4 +34,4 @@ def serialize_except_pw(data):
     return data
 
 
-db = connect_db()
+db = connect_db(mode='TESTING')

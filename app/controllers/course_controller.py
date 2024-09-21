@@ -1,7 +1,5 @@
-
 from flask import jsonify, request
 from models.course import Course
-
 
 course_collection = Course()
 
@@ -23,11 +21,11 @@ def create_course():
             "message": "Course is created successfully",
             "data": {
                 "course_id": str(insert_result.inserted_id)
-            }})
+            }}), 201
     except Exception as e:
         return jsonify({
             "status": 500,
-            "message": f"Failed to create course: {str(e)}"})
+            "message": f"Failed to create course: {str(e)}"}), 500
 
 
 def get_all_course():
@@ -37,7 +35,7 @@ def get_all_course():
             "status": 200,
             "message": "Successful",
             "data": courses
-        })
+        }), 200
     except Exception as e:
         return jsonify({
             "status": 500,
@@ -51,36 +49,33 @@ def get_course_by_id(course_id):
             "status": 200,
             "message": "Successful",
             "data": course
-        })
+        }), 200
     except Exception as e:
         return jsonify({
             "status": 500,
-            "message": f"Failed to get information of course {e}"})
+            "message": f"Failed to get information of course {e}"}), 500
 
 
 def update_course_by_id(course_id):
     data = request.get_json()
-    update_data = {
-        "name": data["name"],
-        "description": data["description"],
-        "duration": data["duration"]
-    }
     try:
-        updated_data = course_collection.update_course(course_id, update_data)
-        if updated_data.matched_count:
+        updated_data = course_collection.update_course(course_id, data)
+        if updated_data.modified_count:
             return jsonify({
-                "data": update_data,
+                "data": {
+                    "_id": course_id
+                },
                 "status": 200,
-                "message": "Course is updated successfully"})
-        else:
-            return jsonify({
-                "status": 404,
-                "message": "Can not save course",
-                "data": None})
+                "message": "Course is updated successfully"}), 200
+
+        return jsonify({
+            "status": 200,
+            "message": "There is no change in database",
+            "data": None}), 200
     except Exception as e:
         return jsonify({
             "status": 500,
-            "message": f"Failed to get information of course: {str(e)}"})
+            "message": f"Failed to get information of course: {str(e)}"}), 500
 
 
 def detele_course_by_id(course_id):
@@ -91,13 +86,13 @@ def detele_course_by_id(course_id):
                 "status": 200,
                 "message": "Course is deleted successfully",
                 "data": None
-            }, 200)
+            }, 204), 204
         else:
             return jsonify({
                 "status": 404,
                 "message": "Can not delete course",
-                "data": None})
+                "data": None}), 404
     except Exception as e:
         return jsonify({
             "status": 500,
-            "message": f"Failed to get information of course: {str(e)}"})
+            "message": f"Failed to get information of course: {str(e)}"}), 500
