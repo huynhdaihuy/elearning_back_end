@@ -5,7 +5,17 @@ course_collection = Course()
 
 
 def create_course():
-    data = request.get_json()
+    required_fields = ['name', 'description',
+                       'duration', 'rating', 'instructor', 'enrolled_student']
+    data: dict = request.get_json()
+    data_fields = data.keys()
+    for field in required_fields:
+        if field not in data_fields:
+            return jsonify({
+                "status": 401,
+                "message": f"Missing required field: {field}",
+                "data": None}), 401
+
     course = {
         "name": data["name"],
         "description": data["description"],
