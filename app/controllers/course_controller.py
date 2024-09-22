@@ -55,6 +55,12 @@ def get_all_course():
 def get_course_by_id(course_id):
     try:
         course = course_collection.get_course_by_id(course_id)
+        if not course:
+            return jsonify({
+                "status": 404,
+                "message": "Course is not found!",
+                "data": course
+            }), 404
         return jsonify({
             "status": 200,
             "message": "Successful",
@@ -69,8 +75,16 @@ def get_course_by_id(course_id):
 def update_course_by_id(course_id):
     data = request.get_json()
     try:
-        updated_data = course_collection.update_course(course_id, data)
-        if updated_data.modified_count:
+        result = course_collection.update_course(
+            course_id, data)
+        is_updated = (result.raw_result)['updatedExisting']
+        print(f'RESULT {is_updated}')
+        if not is_updated:
+            return jsonify({
+                "data": None,
+                "status": 500,
+                "message": f"Failed to get information of course with id: {course_id}"}), 500
+        if result.modified_count:
             return jsonify({
                 "data": {
                     "_id": course_id
