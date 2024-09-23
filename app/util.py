@@ -1,14 +1,15 @@
 from pymongo import MongoClient, errors
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+mongo_uri = os.getenv('MONGO_URI')
+db_name = os.getenv('DB')
 
 
-def connect_db(mode=None):
-    connection_str = "mongodb://localhost:27017/"
-    if mode is None:
-        db_name = 'elearning'
-    else:
-        db_name = 'test_elearning_db'
+def connect_db(mongo_url, db_name):
     try:
-        client = MongoClient(connection_str)
+        client = MongoClient(mongo_url)
         print(f"Connection {db_name} has established succesfully!")
         db = client[db_name]
         return db
@@ -33,5 +34,4 @@ def serialize_except_pw(data):
     data["_id"] = str(data["_id"])
     return data
 
-
-db = connect_db(mode='TESTING')
+db = connect_db(mongo_uri,db_name)

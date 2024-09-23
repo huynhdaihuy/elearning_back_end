@@ -15,7 +15,22 @@ def create_course():
                 "status": 401,
                 "message": f"Missing required field: {field}",
                 "data": None}), 401
-
+    if not isinstance(data['name'], str):
+        raise TypeError('name must be an string')
+    if not isinstance(data['description'], str):
+        raise TypeError('description must be an string')
+    if not isinstance(data['duration'], int):
+        raise TypeError('duration must be an integer')
+    if not isinstance(data['rating'], int):
+        raise TypeError('rating must be an integer')
+    if not isinstance(data['instructor'], str):
+        raise TypeError('instructor must be an string')
+    if not isinstance(data['enrolled_student'], int):
+        raise TypeError('enrolled_student must be an integer')
+    if data['duration'] <= 0:
+        raise ValueError('duration must be greater than 0')
+    if data['rating'] <= 0 and data['rating'] > 5:
+        raise ValueError('rating is invalid range value')
     course = {
         "name": data["name"],
         "description": data["description"],
@@ -78,12 +93,11 @@ def update_course_by_id(course_id):
         result = course_collection.update_course(
             course_id, data)
         is_updated = (result.raw_result)['updatedExisting']
-        print(f'RESULT {is_updated}')
         if not is_updated:
             return jsonify({
                 "data": None,
-                "status": 500,
-                "message": f"Failed to get information of course with id: {course_id}"}), 500
+                "status": 400,
+                "message": f"Failed to get information of course with id: {course_id}"}), 400
         if result.modified_count:
             return jsonify({
                 "data": {
@@ -91,7 +105,6 @@ def update_course_by_id(course_id):
                 },
                 "status": 200,
                 "message": "Course is updated successfully"}), 200
-
         return jsonify({
             "status": 200,
             "message": "There is no change in database",
