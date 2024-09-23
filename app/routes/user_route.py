@@ -7,12 +7,12 @@ from controllers.user_controller import (
     upload_avatar,
     update_infor_user
 )
-from middlewares.token_middleware import token_required
+# from middlewares.token_middleware import token_required
 user_bp = Blueprint("user_bp", __name__)
 
 
 @user_bp.route('/user', methods=["GET"])
-@token_required(expected_role="user")
+# @token_required(expected_role="user")
 def get_all_user_route():
     return get_all_user()
 
@@ -22,17 +22,17 @@ def get_user_by_id_route(user_id):
     return get_user_by_id(user_id)
 
 
-@user_bp.route('/user/<user_id>', methods=["DELETE"])
-def detele_user_by_id_route(user_id):
-    return detele_user_by_id(user_id)
-
-
 @user_bp.route('/user/<user_id>', methods=["PUT"])
 def update_user_by_id_route(user_id):
     return update_infor_user(user_id)
 
 
-@user_bp.route('/user/', methods=["DELETE"])
+@user_bp.route('/user/<user_id>', methods=["DELETE"])
+def detele_user_by_id_route(user_id):
+    return detele_user_by_id(user_id)
+
+
+@user_bp.route('/user', methods=["DELETE"])
 def detele_users_route():
     return detele_users()
 

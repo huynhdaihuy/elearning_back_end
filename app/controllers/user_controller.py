@@ -3,6 +3,8 @@ from flask import jsonify, request
 from models.user import User
 from service.upload_service import UploadService
 from util import serialize
+from bson import ObjectId
+
 user_collection = User()
 upload_service = UploadService()
 
@@ -10,7 +12,12 @@ upload_service = UploadService()
 def get_all_user():
     try:
         users = user_collection.get_all_user()
-        print("ISGETTINGALLUSER")
+        if len(users) == 0:
+            return jsonify({
+                "status": 200,
+                "message": "There is no user in database",
+                "data": None
+            }), 200
         return jsonify({
             "status": 200,
             "message": "Successful",
@@ -41,10 +48,10 @@ def detele_user_by_id(user_id):
         deleted_data = user_collection.delete_user(user_id)
         if deleted_data.deleted_count:
             return jsonify({
-                "status": 200,
+                "status": 204,
                 "message": "User is deleted successfully",
                 "data": None
-            }), 200
+            }), 204
         else:
             return jsonify({
                 "status": 404,
@@ -58,13 +65,15 @@ def detele_user_by_id(user_id):
 
 def detele_users():
     try:
-        deleted_data = user_collection.delete_users()
-        if deleted_data.deleted_count:
+        deleted_count = user_collection.delete_users().deleted_count
+        if deleted_count:
             return jsonify({
                 "status": 200,
                 "message": "All users are deleted successfully",
-                "data": None
-            }), 200
+                "data": {
+                    "deleted_count":  deleted_count
+                }
+            }),200
         else:
             return jsonify({
                 "status": 404,
@@ -116,7 +125,7 @@ def update_infor_user(user_id):
             "status": 404,
             "data": None}), 404
     try:
-        result = user_collection.update_user(user_id, update_field)
+        result = user_collection.update_user(ObjectId(user_id), update_field)
         if result.matched_count == 0:
             return jsonify({
                 "message": "User not found",
@@ -128,7 +137,11 @@ def update_infor_user(user_id):
                 "message": "No changes made to the user information",
                 "status": 200
             }), 200
-
+        return jsonify({
+            "message": "User is updated successfully!",
+            "status": 200,
+            "data": None
+        }), 200
     except Exception as e:
         return jsonify({
             "status": 500,
