@@ -8,10 +8,10 @@ def test_create_course(client):
         "instructor": "Intructor mock data",
         "enrolled_student": 0
     }
-    respone = client.post('courses', json=mock_data)
+    response = client.post('courses', json=mock_data)
 
-    assert respone.status_code == 201
-    assert respone.get_json()['message'] == 'Course is created successfully'
+    assert response.status_code == 201
+    assert response.get_json()['message'] == 'Course is created successfully'
 
 
 def test_get_courses(client, mongo):
@@ -20,10 +20,10 @@ def test_get_courses(client, mongo):
         "description": "Test get courses description"
     }
     course_id = str(mongo.course.insert_one(mock_data).inserted_id)
-    respone = client.get('/courses')
-    courses = respone.get_json()['data']
+    response = client.get('/courses')
+    courses = response.get_json()['data']
     assert len(courses) > 0
-    assert respone.status_code == 200
+    assert response.status_code == 200
     assert any(course["_id"] ==
                course_id for course in courses)
 
@@ -35,9 +35,9 @@ def test_get_course_by_id(client, mongo):
     }
     course_id = str(mongo.course.insert_one(
         mock_data).inserted_id)
-    respone = client.get(f'/courses/{course_id}')
-    course = respone.get_json()['data']
-    assert respone.status_code == 200
+    response = client.get(f'/courses/{course_id}')
+    course = response.get_json()['data']
+    assert response.status_code == 200
     assert course_id == course['_id']
 
 
@@ -50,11 +50,11 @@ def test_update_course(client, mongo):
     update_data = {
         'name': 'Test update course test_update_course'}
 
-    respone = client.put(f'courses/{str(course_id)}', json=update_data)
-    data = respone.get_json()['data']
+    response = client.put(f'courses/{str(course_id)}', json=update_data)
+    data = response.get_json()['data']
     updated_course_id = data['_id']
 
-    assert respone.status_code == 200
+    assert response.status_code == 200
     assert updated_course_id == course_id
 
 
@@ -64,5 +64,5 @@ def test_delete_course(client, mongo):
         "description": "Test get courses description test_delete_course"
     }
     course_id = str(mongo.course.insert_one(mock_data).inserted_id)
-    respone = client.delete(f'/courses/{course_id}')
-    assert respone.status_code == 204
+    response = client.delete(f'/courses/{course_id}')
+    assert response.status_code == 204
